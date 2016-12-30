@@ -1,0 +1,793 @@
+CS 124/LINGUIST 180
+From Languages to Information
+Conversational	Agents
+Dan	Jurafsky
+Stanford	University
+Conversational Agents
+AKA Dialog Agents
+Phone-based	Personal	Assistants	
+SIRI,	Cortana,	Google	Now
+Talking	to	your	car
+Communicating	with	robots
+Clinical	uses	for	mental	health
+Chatting	for	fun
+Two classes of systems
+1. Goal-based	dialog	agents
+- SIRI,	interfaces	to	cars,	robots,	
+2. Chatbots
+ a
+
+
+Architectures for Practical Dialog
+Systems
+Finite-State	
+Just	for	passwords	or	credit	cards
+Active	Ontology/Frame	Based
+SIRI	etc
+(I	won’t	talk	about	POMDPs,	used	in	
+academic	systems)
+How SIRI works Interaction Model
+Speech
+Synthesis
+Output
+to User
+Speech
+Synthesis
+Elicitation
+Interaction Context
+World Knowledge
+Word
+Sequence
+Input
+from User
+Speech
+Recognition
+Semantic
+Interpretation
+LPM
+ Training
+NL Understanding
+Clarifying
+Question
+Dialog
+Management
+Missing
+Elements
+incomplete
+Best
+Outcome
+Inferred
+User Intent
+Action
+Selection
+complete
+?
+Figure	from	Jerome	Bellegarda
+Finite-State Dialog Management
+Consider	a	trivial	airline	travel	system:
+Ask	the	user	for	a	departure	city
+Ask	for	a	destination	city
+Ask	for	a	time
+Ask	whether	the	trip	is	round-trip	or	not	
+Finite State Dialog Manager
+Finite-state dialog managers
+ System	completely	controls	the	
+conversation	with	the	user.
+ It	asks	the	user	a	series	of	questions
+ Ignoring	(or	misinterpreting)	anything	
+the	user	says	that	is	not	a	direct	
+answer	to	the	system’s	questions
+Dialogue Initiative
+ Systems	that	control	conversation	like	
+this	are	system	initiative	or	single	
+initiative.
+ Initiative:	who	has	control	of	
+conversation
+ In	normal	human-human	dialogue,	
+initiative	shifts	back	and	forth	between	
+participants.
+System Initiative
+System	completely	controls	the	conversation
+ Simple	to	build
+ User	always	knows	what	they	can	say	next
+ System	always	knows	what	user	can	say	next
+ Known	words:	Better	performance	from	ASR
+ Known	topic:		Better	performance	from	NLU
+ OK	for	VERY	simple	tasks	(entering	a	credit	card,	
+or	login	name	and	password)
+ Too	limited
++
+-
+Problems with System Initiative
+ Real	dialogue	involves	give	and	take!
+ In	travel	planning,	users	might	want	to	say	
+something	that	is	not	the	direct	answer	to	the	
+question.
+ For	example	answering	more	than	one	question	in	
+a	sentence:
+Hi,	I’d	like	to	fly	from	Seattle	Tuesday	morning;
+I	want	a	flight	from	Milwaukee	to	Orlando	one	
+way	leaving	after	5	p.m.	on	Wednesday.
+Single initiative + universals
+ We	can	give	users	a	little	more	flexibility	by	adding	
+universals:	commands	you	can	say	anywhere
+ As	if	we	augmented	every	state	of	FSA	with	these
+Help
+Start	over
+Correct
+ This	describes	many	implemented	systems
+ But	still	doesn’t	allow	user	much	flexibility
+Mixed Initiative
+ Conversational	initiative	can	shift	between	system	
+and	user
+ Simplest	kind	of	mixed	initiative:	use	the	structure	
+of	the	frame to	guide	dialogue
+Slot Question
+ORIGIN What	city	are	you	leaving	from?
+DEST Where	are	you	going?
+DEPT	DATE What	day	would	you	like	to	leave?
+DEPT	TIME What	time	would	you	like	to	leave?
+AIRLINE What	is	your	preferred	airline?
+Frames are mixed-initiative
+ User	can	answer	multiple	questions	at	once.
+ System	asks	questions	of	user,	filling	any	slots	that	
+user	specifies
+ When	frame	is	filled,	do	database	query
+ If	user	answers	3	questions	at	once,	system	has	to	
+fill	slots	and	not	ask	these	questions	again!
+ Avoids	strict	constraints	on	order	of	the	finitestate
+architecture.
+Natural Language Understanding
+ There	are	many	ways	to	represent	the	
+meaning	of	sentences
+ For	speech	dialogue	systems,	most	common	
+is	“Frame	and	slot	semantics”.
+An example of a frame
+Show	me	morning	flights	from	Boston	to	SF	on	Tuesday.
+SHOW:
+FLIGHTS:
+ORIGIN:
+CITY:	Boston
+DATE:		Tuesday
+TIME:		morning
+DEST:
+CITY:	San	Francisco
+Semantics for a sentence
+LIST							FLIGHTS			ORIGIN
+Show	me			flights						from	Boston	
+DESTINATION									DEPARTDATE
+to	San	Francisco		on			Tuesday
+DEPARTTIME
+morning
+The way SIRI does NLU:
+Condition-Action Rules
+ Active	Ontology:	relational	network	of	concepts
+data	structures:	a	meeting has	
+a	date	and	time,	
+a	location,	
+a	topic	
+a	list	of	attendees	
+rule	sets	that	perform	actions	for	concepts
+the	date concept	turns	string
+Monday	at	2pm	into
+ date	object	date(DAY,MONTH,YEAR,HOURS,MINUTES)
+Rule sets
+ Collections	of	rules consisting	of:	
+ condition	
+ action	
+ When	user	input	is	processed,		facts	added	
+to	store	and
+ rule	conditions	are	evaluated	
+ relevant	actions	executed
+Part of ontology for meeting task
+has-a may-have-a
+meeting	concept:	if	you	don’t	yet	have	a	location,	ask	for	a	
+location
+
+Improvements to the Rule-Based Approach
+ Statistical	classifiers	to	map	words	to	semantic	framefillers
+ Given	a	set	of	labeled	sentences
+ “I	want	to	fly	to	San	Francisco	on	Tuesday”
+ Destination:	SF
+ Depart-date:	 Tuesday
+ Build	a	classifier	to	map	from	one	to	the	author
+ Requirements:	Lots	of	labeled	data
+Chatbots
+ ELIZA	(1966)
+ PARRY	(1968)
+ The	first	system	to	pass	the	Turing	test
+ ALICE
+ CLEVER
+ Microsoft	XiaoIce ⼩冰
+Chatbot Architectures
+ Rule-based
+Pattern-action	rules	(Eliza)
++	a	mental	model	(Parry)
+ Corpus-based	(from	large	chat	corpus)
+Information	Retrieval
+Deep	neural	nets
+Eliza: Weizenbaum (1966)
+Men	are	all	alike.
+IN	WHAT	WAY
+They're	always	bugging	us	about	something	or	other.	
+CAN	YOU	THINK	OF	A	SPECIFIC	EXAMPLE	
+Well,	my	boyfriend	made	me	come	here.
+YOUR	BOYFRIEND	MADE	YOU	COME	HERE	
+He	says	I'm	depressed	much	of	the	time.
+I	AM	SORRY	TO	HEAR	YOU	ARE	DEPRESSED	
+...
+WHO	ELSE	IN	YOUR	FAMILY	TAKES	CARE	0F	YOU?
+My	father
+YOUR	FATHER
+You	are	like	my	father	in	some	ways.
+WHAT	RESEMBLANCE	DO	YOU	SEE
+You	are	not	very	aggressive	but	I	think	you	don’t	want	me	to	
+notice	that.
+WHAT	MAKES	YOU	THINK	I	AM	NOT	AGGRESSIVE
+You	don’t	argue	with	me.
+WHY	DO	YOU	THINK	I	DON’T	ARGUE	WITH	YOU
+You	are	afraid	of	me.
+DOES	IT	PLEASE	YOU	TO	BELIEVE	I’M	AFRAID	OF	YOU
+My father is afraid of	everybody.
+WHAT	ELSE	COMES	TO	MIND	WHEN	YOU	THINK	OF	YOUR	
+FATHER
+Bullies.
+DOES	THAT	HAVE	ANYTHING	TO	DO	WITH	THE	FACT	THAT	YOUR	
+BOYFRIEND	MADE	YOU	COME	HERE
+Domain: Rogerian psychology interview
+Draw	the	patient	out	by	reflecting	patient’s	statements	
+back	at	them
+Rare	type	of	conversation	in	which	one	can	“assume	
+the	pose	of	knowing	almost	nothing	of	the	real	world”
+Patient:	"I	went	for	a	long	boat	ride”
+Psychiatrist:	"Tell	me	about	boats”
+ You	don’t	assume	she	didn’t	know	what	a	boat	is
+ You	assume	she	had	some	conversational	goal
+ Most	chatbots trying	to	pass	Turing	test	choose	a	
+domain	with	similar	properties
+Eliza pattern/transform rules
+(0 YOU 0 ME) [pattern]
+à
+(WHAT MAKES YOU THINK I 3 YOU) [transform]
+You hate me
+WHAT MAKES YOU THINK I HATE YOU
+0		means	kleene *
+The	3	is	the	constituent	#	in	pattern
+Eliza Rules
+A formal notation in which to represent the decomposition
+template is:
+(0 YOU 0 ME)
+and the reassembly rule
+(WHAT MAKES YOU THINK I 3 YOU).
+The "0" in the decomposition rule stands for "an indefinite
+number of words" (analogous to the indefinite
+dollar sign of COMIT) [6] while the "3" in the reassembly
+rule indicates that the third component of the subject
+decomposition is to be inserted in its place. The decomposition
+rule
+(0 YOU 1 ME)
+would have worked just as well in this specific example. A
+nonzero integer "n" appearing in a decomposition rule
+indicates that the component in question should consist
+of exactly "n" words. However, of the two rules shown,
+only the first would have matched the sentence, "It seems
+you hate and love me," the second failing because there is
+more than one word between "you" and "me".
+~1 RI,1 R1,2"'" Rl,ml D2 R2J RZ,Z" " "Rz,m2 De Ra,t FIn'2~ '" " R%nan
+Fro. 1. :Keyword and rule list structure
+in ELIZA the question of which decomposition rules to
+apply to an input text is of course a crucial one. The input
+sentence might have been, for example, "It seems that
+you hate," in which ease the decomposition rule (0 YOU
+0 ME) would have failed in that the word "ME" would
+not have been found at all, let alone in its assigned place.
+Some other decomposition rule would then have to be
+tried and, failing that, still another until a match could
+be made or a total failure reported. ELIZA must therefm~
+have a mechanism to sharply delimit the set of decomposition
+rules which are potentially applicable to a currently
+active input sentence. This is the keyword mechanism.
+
+An input sentence is scanned from left to right. Each
+word is looked up in a dictionary of keywords. If a word
+is identified as a keyword, then (apart from the issue of
+precedence of keywords) only decomposition rules containing
+that keyword need to be tried. The trial sequence
+can even be partially ordered. For example, the decomposition
+rule (0 YOU 0) associated with the keyword
+"YOU" (and decomposing an input sentence into (1) all
+words in front of "YOU", (2) the word "YOU", and (3)
+all words following "YOU") should be the last, one tried
+since it is bound to succeed.
+Two problems now arise. One stems from the fact that
+almost none of the words in any given sentence are repre.
+sented in the keyword dictionary. The other is that of
+"associating" both decomposit;ion and reassembly rules
+with keyword~-;. The iirst is serious in that the determination
+that a word is not in a dictionary may well require
+more computation (i.e., time) than the location of a word
+which is represented. The attack on both problems begins
+by placing both a keyword trod its associated rules on a
+list. The basic format of a typical key list is the following:
+(K ((D0 (R~. t) (R~, 2) "'" (Rt .... ))
+((D2) (R2. ~) (R2.2) "" (R2.,,,~))
+:
+((D,~) (R,,, ~) (taw, ~) ... (R,~, .~)))
+where K is the keyword, D, the it, h decomposition rule
+associated with K and R¢, ~ the jth reassembly rule ass0.
+ciated with the ith decomposition rule.
+A common pictorial representation of such a structure
+is the tree diagram shown in Figure 1. The top level of
+this structure contains the keyword followed by the names
+of lists; each one of which is again a list structure beginning
+with a decomposition rule and followed by reassembly
+rules. Since list structures of this type have no predetermined
+dimensionality limitations, any number of decomposition
+rules may be associated with a given keyword and
+any number of reassembly rules witch any specific decomposition
+rule. SLiP i8 rich in functions that sequence over
+structures of this type efficiently. Hence programmin
+problems are minimized.
+An ELIZA script consists mainly of a set of list structures
+of the type shown. The actual keyword dictionary is
+constructed when such a script is first read into the
+hitherto empty program. The basic structural component
+of the keyword dictionary is a vector KEY of (currently)
+128 contiguous computer words. As a particular key list
+structure is read the keyword K at its top is randomized
+(hashed) by a procedure that produces (currently) a 7
+bit integer "i". The word "always", for example, yields
+the integer 14. KEY(i), i.e., the ith word of the vector
+KEY, is then examined to determine whether it contains
+a list. name. If it does not, then an empty list is created,
+its name placed in KEY(i), and the key list structure in
+question placed on that list. If KEY(i) already contains a
+list name, then the name of the key list structure is placed
+on the bottom of the list named in KEY(i). The largest
+dictionary so far attempted contains about 50 keywords.
+No list named in any of the words of the KEY vector
+contains more than two key list structures.
+Every word encountered in the scan of an input text,
+i.e., during the actual operations of ELIZA, is randomized
+by the same hashing algorithm as was originally applied to
+the incoming keywords, hence yields an integer which
+points to the only possible list structure which could
+potentially contain that word as a keyword. Even then,
+only the tops of any key list structures that may be found
+there need be interrogated to determine whether or not a
+keyword has been found. By virtue of the various list
+38 Communications of tile ACM Volume 9 / Number 1 / January, 1966
+keyword
+pattern Ranked	list	of	transforms
+ELIZA architecture
+ Examine	each	word	w in	user	sentence
+Return	the	w with	highest	keyword	rank
+If	w	exists:
+Check	each	rule	for	w	in	ranked	order
+ Choose	first	one	that	matches	sentence
+Apply	transform
+ If	no	keyword	applies,	either
+Apply	the	transform	for	the	“NONE”	key,	or
+Grab	an	action	off	the	memory	queue
+Keywords are ranked from specific to general
+I know everybody laughed at me
+ “I”	is	a	very	general	keyword:
+I: (I *) -> (You say you 2)
+YOU SAY YOU KNOW EVERYBODY LAUGHED AT YOU
+ “Everbody”	is	much	more	interesting	(someone	using	
+universals	like	everybody/always	is	probably	“referring	
+to	some	quite	specific	event	or	person”)
+WHO IN PARTICULAR ARE YOU THINKING OF?
+ Implementation:	keywords	stored	with	their	rank	
+Everybody 5 (transformation rules)
+I 0 (transformation rules)
+NONE
+PLEASE	GO	ON
+THAT’S	VERY	INTERESTING
+I	SEE
+Memory
+(MEMORY MY
+(0 YOUR 0 = LETS DISCUSS FURTHER WHY YOUR 3)
+(0 YOUR 0 = EARLIER YOU SAID YOUR 3)
+ Whenever	“MY”	is	highest	keyword
+ Randomly	select	a	transform	on	the	MEMORY	list	
+Apply	to	sentence
+ Store	on	a	stack
+ Later,	if	no	keyword	matches	a	sentence
+ Return	the	top	of	the	MEMORY	queue	instead
+ [Fun	fact:	this	queue	is	the	earliest	hierarchical	
+model	of	discourse]
+Other Eliza stuff
+ Rules	can	refer	to	classes	of	words
+Family = mother, father, brother, sister
+NOUN = …
+ Don’t	reuse	transforms	in	the	same	conversation
+ Whenever	we	use	a	transform	associated	with	a	pattern
+ We	increment	a	counter	for	that	rule
+ So	the	next	time	we	use	the	next	ranked	trasnform
+ Some	basic	transforms	happen	during	input	processing
+ I	->	YOU
+ YOU	->	I
+Some implications
+ People		became	deeply	emotionally	involved	with	the	
+program
+ Weizenbaum tells	the	story	of	his	secretary	who	
+would	ask	Weizenbaum to	leave	the	room	when	she	
+talked	with	ELIZA
+ When	he	suggested	that	he	might	want	to	store	all	the	
+ELIZA	conversations	for	later	analysis,	people	
+immediately	pointed	out	the	privacy	implications
+ Suggesting	that	they	were	having	quite	private	
+conversations	with	ELIZA
+ Anthropomorphicismand	the	Heider-Simmel Illusion
+ https://www.youtube.com/watch?v=8FIEZXMUM2I
+Parry
+ Colby	1971	at	Stanford
+ Same	pattern-response	structure	as	Eliza
+ But	a	much	richer:
+ control	structure	
+ language	understanding	capabilities
+ mental	model:	Parry	has	affective	variables
+ Anger,	Fear,	Mistrust
+ “If	Anger	level	is	high,	respond	with	hostility”
+ The	first	system	to	pass	the	Turing	test	(in	1971)
+ Psychiatrists	couldn’t	distinguish	interviews	with	
+PARRY	from	interviews	with	real	paranoids
+39
+Parry’s persona
+ 28-year-old	single	man,	post	office	clerk
+ no	siblings	and	lives	alone
+ sensitive	about	his	physical	appearance,	his	family,	
+his	religion,	his	education	and	the	topic	of	sex.
+ hobbies	are	movies	and	gambling	on	horseracing,	
+ recently	attacked	a	bookie,	claiming	the	bookie	did	
+not	pay	off	in	a	bet.	
+ afterwards	worried	about	possible	underworld	
+retaliation
+ eager	to	tell	his	story	to	non-threating	listeners.	
+ARTIHClAL PARANOIA 7
+'! ¸
+''is
+G
+FIG. 1. General outline of program's operations.
+Artificial Intelligence 2 (1971), 1-25
+Parry’s
+Architecture
+Affect variables
+ Fear	and	Anger	(each	ranging	0-20)
+ Mistrust	(ranging	0-15)
+ Initial	conditions:	All	low
+ After	each	user	turn,	if	nothing	malevolent	in	input
+ Anger	drops	by	1,	Fear	drops	by	0.3
+ Mistrust	drops	by	0.05	to	base	level
+ Otherwise	depends	on	what	the	user	says
+ Each	user	statement	can	change	Fear	and	Anger
+ Insults	increases	Anger	by	some	percentage
+ Mistrust	goes	up	if	Fear	or	Anger	do
+Lots of complex I-O rules
+ User	implies	Parry	is	mentally	ill
+ Rise	in	Fear	and	Anger
+ User	mentions	“Mafia”	or	associated	concepts	(“kill”):
+ First	mention:	rise	in	Fear
+ Later	mentions:	depends	on	willingness	to	discuss,	which	
+depends	on	current	levels	of	Fear,	Anger,	Mistrust
+ User	mentions	Parry
+ Flattery	(positive	mention)	
+ decreases	 fear/anger	 if	Mistrust	is	low
+ Increases	 Anger	if	Mustrust is	high
+ User	attitudes	toward	Parry
+ Negative	attitudes	 (fear,	 disbelief)	 increas Fear/Anger
+Flare concepts
+ List	of	concepts	related	to	Mafia
+ An	ordered	graph	designed	to	lead	interviewer	to	topic
+horsesà horseracingàgamblingàbookiesàunderwoldàMafia
+ The	mention	of	a	new	flare	topic	by	interviewer	causes	a	
+rise	in	Fear
+ Flare	topics	cause	Parry	to	give	preset	responses	to	that	
+flare
+Each sentence is mapped into a
+conceptualization
+ A	predication	on	a	conceptual	object
+ A	predication	on	a	relation	between	two	objects
+ A	predication	on	an	attribute:
+What is your work?
+What sort of work do you do?
+Where do you work? à (your work?)
+What do you do for a living?
+What is your job?
+Do you have a job?
+What is your occupation
+ Complex	Pattern/transform	rules
+ Different	 predicates	 (fear,	 afraid	of)
+ Ordering	 (You	are	afraid	 of	me	=	I	frighten	you)
+Detecting Other’s Intent
+Detecting Other’s Intent
+A Parry conversation
+(1)	How	 are	you	today?
+OK.
+(2)What	is	your	name?
+MY	NAME	IS	FRANK	SMITH.	
+(3)	How	 old	are	you?
+TWENTY-EIGHT.
+(4)	Are	you	married?
+NO. (5)	What	sort	of	work	do	you	do?
+I	WORK	IN	THE	POST	OFFICE.	
+(6)	Why	are	you	in	the	hospital?
+I	SHOULDN’T	BE	HERE
+(7)	Who	brought	you	here?
+THE	POLICE	
+[FEAR rises slightly because police linked in graph to MAFIA]
+48
+(9)	What	trouble	did	you	have	with	the	police
+COPS	DON'T	DO	THEIR	JOB.								['police’	acts	as	a	flare]
+(10)	What	do	they	do	instead?
+COPS	ARREST	THE	WRONG	PEOPLE.
+(11)	They	arrest	the	right	ones	sometimes
+THE	LAW	SHOULD	GET	THOSE	ITALIAN	CROOKS.
+(12)	Do	you	know	any	Italian	crooks?
+I	TRY	TO	AVOID	THE	UNDERWORLD.	
+(13)	Are	you	afraid	of	the	underworld?
+THE	MAFIA	ARE	THE	WORST	GANGSTERS.	
+(15)		Are	you	connected	with	the	Mafia?
+YOU	KNOW,	THEY	KNOW	ME.	
+(16)	How	do	they	know	you?
+THEY	SPY	ON	ME.	
+(20)	ARE	YOU	SURE	OF	ALL	THIS	?	
+YOU	DON'T	BELIEVE	ME	?	 [FEAR,	ANGER,	MISTRUST	 GO	UP]
+When fear is high, the model won’t
+discuss its beliefs
+(1)	Is	the	law	after	you?
+THE	LAW	SHOULD	GET	THOSE	ITALIAN	CROOKS.	
+(2)	Do	you	mean	the	Mafia?
+LET'S	TALK	ABOUT	SOMETHING	ELSE.	
+(3)	Are	you	afraid	of	the	Mafia
+I'D	RATHER	NOT	DISCUSS	IT.	
+[Fear	is	too	high	so	Parry	won’t	talk	about	'Mafia’.]
+(4)	Perhaps	you	are	paranoid	about	them?
+YOU	WANT	TO	KEEP	ME	IN	THE	HOSPITAL.
+(The	model	interprets	being	called	'paranoid’	as	an	insult	
+and	as	an	intent	to	control,	so	ANGER	&	FEAR	rise)
+Eliza Meets Parry
+Good	Evening.		Tell	me	your	problems.		Please	terminate	
+input	with	a	period	or	a	question	mark.
+*People	get	on	my	nerves	sometimes.
+I	am	not	sure	I	understand	you	fully.
+*You	should	pay	more	attention.
+Suppose	you	should	pay	more	attention.
+*You're	entitled	to	your	own	opinion.
+What	makes	you	think	I	am	entitled	to	my	own	opinion?
+*It	bothers	me	just	to	be	around	people	in	general.
+Please	go	on.
+*I	went	to	the	track	at	Bay	Meadows	a	while	back.
+What	does	that	suggest	to	you?
+*I	went	to	the	races.
+What	else	would	you	like	to	discuss?
+Vincent Cert, RFC439
+*Horseracing	interests	me.
+Why	do	you	say	that	just	now?
+*There's	a	lot	of	crooked	gambling	going	on	there.
+I	am	not	sure	I	understand	you	fully,
+*It's	clear	to	me	if	not	to	you.
+Do	you	think	its	likely	that	not	to	I?
+*I	went	to	the	races.
+Please	go	on.
+*I	gamble	on	horses.
+What	does	that	suggest	to	you?
+*I	went	to	the	races.
+What	else	would	you	like	to	discuss?
+*Gambling	has	been	nothing	but	trouble	to	me.
+Why	do	you	say	that	just	now?
+*I've	had	experience	with	crooks	gambling	at	the	track.
+I	am	not	sure	I	understand	you	fully.
+*I've	already	told	you	enough	about	that.
+IR-based models of chatbots
+ Cleverbot
+ Xiaoice
+ Mine	conversations	of	human	chats	or	humanmachine
+chats
+ Choose	a	response	by	finding	a	prior	turn	that	
+matches	the	users’sturn,	and	give	the	prior	response	
+to	that	turn.
+ (We	think;	there	are	no	published	papers	on	these	
+systems)
+Deep-learning chatbots
+ Train	on:
+ movie	dialogue	databases
+ twitter	conversations
+ Train	a	deep	neural	net	to	map	from	one	users	turn	to	
+the	other	users	response
+Seq2seq model architecture
+Figure 1: The computational graph of the HRED architecture for a dialogue composed of three turns. Each utterance is
+encoded into a dense vector and then mapped into the dialogue context, which is used to decode (generate) the tokens in the
+next utterance. The encoder RNN encodes the tokens appearing within the utterance, and the context RNN encodes the temporal
+structure of the utterances appearing so far in the dialogue, allowing information and gradients to flow over longer time spans.
+The decoder predicts one token at a time using a RNN. Adapted from Sordoni et al. (2015a).
+the advantage that the embedding matrix E may separately
+be bootstrapped (e.g. learned) from larger corpora. Analogously,
+the matrix O 2 Rdh⇥|V | represents the output word
+embeddings, where each possible next token is projected
+into another dense vector and compared to the hidden state
+hn. The probability of seeing token v at position n + 1 increases
+if its corresponding embedding vector Ov is “near”
+the context vector hn. The parameter H is called a recurrent
+parameter, because it links hn1
+to hn. All parameters are
+learned by maximizing the log-likelihood of the parameters
+on a training set using stochastic gradient descent.
+Hierarchical Recurrent Encoder-Decoder
+Our work extends the hierarchical recurrent encoderdecoder
+architecture (HRED) proposed by Sordoni et
+al. (2015a) for web query suggestion. In the original framework,
+HRED predicts the next web query given the queries
+already submitted by the user. The history of past submitted
+queries is considered as a sequence at two levels: a sequence
+of words for each web query and a sequence of queries.
+HRED models this hierarchy of sequences with two RNNs:
+one at the word level and one at the query level. We make
+a similar assumption, namely, that a dialogue can be seen
+as a sequence of utterances which, in turn, are sequences of
+tokens. A representation of HRED is given in Figure 1.
+In dialogue, the encoder RNN maps each utterance to an
+utterance vector. The utterance vector is the hidden state
+obtained after the last token of the utterance has been processed.
+The higher-level context RNN keeps track of past utterances
+by processing iteratively each utterance vector. After
+processing utterance Um, the hidden state of the context
+RNN represents a summary of the dialogue up to and including
+turn m, which is used to predict the next utterance Um+1.
+This hidden state can be interpreted as the continuous-valued
+state of the dialogue system. The next utterance prediction is
+performed by means of a decoder RNN, which takes the hidden
+state of the context RNN and produces a probability distribution
+over the tokens in the next utterance. The decoder
+RNN is similar to the RNN language model (Mikolov et al.
+2010), but with the important difference that the prediction
+is conditioned on the hidden state of the context RNN. It can
+be interpreted as the response generation module of the dialogue
+system. The encoder, context and decoder RNNs all
+make use of the GRU hidden unit (Cho et al. 2014). Everywhere
+else we use the hyperbolic tangent as activation function.
+It is also possible to use the maxout activation function
+between the hidden state and the projected word embeddings
+of the decoder RNN (Goodfellow et al. 2013). The
+same encoder RNN and decoder RNN parameters are used
+for every utterance in a dialogue. This helps the model generalize
+across utterances. Further details of the architecture
+are described by Sordoni et al. (2015a).
+For modeling dialogues, we expect the HRED model to be
+superior to the standard RNN model for two reasons. First,
+because the context RNN allows the model to represent a
+form of common ground between speakers, e.g. to represent
+topics and concepts shared between the speakers using a distributed
+vector representation, which we hypothesize to be
+important for building an effective dialogue system (Clark
+and Brennan 1991). Second, because the number of computational
+steps between utterances is reduced. This makes
+the objective function more stable w.r.t. the model parameters,
+and helps propagate the training signal for first-order
+optimization methods (Sordoni et al. 2015a).
+Serban, Iulian V., Alessandro Sordoni, Yoshua Bengio, Aaron Courville, and Joelle
+Pineau. 2015. "Building End-To-End Dialogue Systems Using Generative
+Hierarchical Neural Network Models.
+Sample outputs from a neural net chatbot
+How	are	you	doing?	
+I’m	good,	you?	
+I	am	off	all	week	next	week
+What	time	you	going?	
+I	know	you	love	me	and	I	love	you.
+I	love	you	too,	baby.	
+Ohh I’ve	never	seen	that!	How	long	does	it	take	you	
+guys	to	learn	the	drill?	
+Like	2	weeks	ago!!	 ?
+Jiwei Li, Michel Galley, Chris Brockett,
+Jianfeng Gao, and Bill Dolan. 2015.
+A Diversity-Promoting Objective Function
+for Neural Conversation Models.
+Sample output from a neural net chatbot
+# Context c Message m Generated Response r
+1 noone can help this time its just i need a support system well im here to support you. whenever you
+need me.
+thank you, i appreciate it thank you
+2 nothin much, and how’s the book?! its good but i’m only like halfway through
+cuz i don’t feel like reading. i’m so bored ...
+that’s good! i have the book but i’m
+bored too.
+3 i know! what have you been up to? nothing really. just enjoying summer and
+working. what about you?
+that’s good! nothing much just
+listening to music and you?
+4 thanks, your way better though i’m just good at expressing it that’s but trust
+me you are freakin amazing and waay better
+i know, i don’t trust you, i love you
+too! thank you
+5 thanks. yeah i am good thanks! good, but angry! sorry you’re angry, been there, i hope it dies
+down.
+i hope so too, i’m not angry!!
+6 figures. bass. never ate bass. bass is extremely mild with very few bones.
+my favorite after catfish
+that’s one of the bones, chuck bass is
+mine too.
+7 today i will walk for miles. clear sky clear mind. love walking. it’s too hot to walk this month.
+i haven’t moved. frozen. heat freeze.
+it’s too hot for you to get up to honey
+if you have frozen yogurt to you.
+8 arresting people over “nasty tweets”? please. i’m not
+condoning what the lad did but arresting him is a tad
+silly.
+it appears he may have sent death threats to
+others while all this was kicking off too.
+i did! he was armed with nuclear
+threats? that’s what’s happening to
+you.
+Table 5: Sample responses produced by the MT-based DCGM-II+CMM system.
+information that conflicts either internally within the
+response itself, or is at odds with the context, as in examples
+4-5. This is not unsurprising, since our model
+lacks mechanisms both for reflecting agent intent in
+the response and for maintaining consistency with
+respect to sentiment polarity. Longer context and
+message components may also result in responses
+that wander off-topic or lapse into incoherence as in
+6-8, especially when relatively low frequency unigrams
+(“bass”, “threat”) are echoed in the response.
+In general, we expect that larger datasets and incorporation
+of more extensive contexts into the model will
+help yield more coherent results in these cases. Consistent
+representation of agent intent is outside the
+scope of this work, but will likely remain a significant
+challenge.
+7 Conclusion
+We have formulated a neural network architecture
+for data-driven response generation trained from social
+media conversations, in which generation of
+responses is conditioned on past dialog utterances
+that provide contextual information. We have proposed
+a novel multi-reference extraction technique
+allowing for robust automated evaluation using standard
+SMT metrics such as BLEU and METEOR.
+Our context-sensitive models consistently outperform
+both context-independent and context-sensitive
+baselines by up to 11% relative improvement in
+BLEU in the MT setting and 24% in the IR setting, albeit
+using a minimal number of features. As our models
+are completely data-driven and self-contained,
+they hold the potential to improve fluency and contextual
+relevance in other types of dialog systems.
+Our work suggests several directions for future
+research. We anticipate that there is much room for
+improvement if we employ more complex neural network
+models that take into account word order within
+the message and context utterances. Direct generation
+from neural network models is an interesting and
+potentially promising next step. Future progress in
+this area will also greatly benefit from thorough study
+of automated evaluation metrics.
+Acknowledgments
+We thank Alan Ritter, Ray Mooney, Chris Quirk,
+Lucy Vanderwende, Susan Hendrich and Mouni
+Reddy for helpful discussions, as well as the three
+anonymous reviewers for their comments.
+References
+Michael Auli, Michel Galley, Chris Quirk, and Geoffrey
+Zweig. 2013. Joint language and translation modeling
+with recurrent neural networks. In Proc. of EMNLP,
+pages 1044–1054.
+Satanjeev Banerjee and Alon Lavie. 2005. METEOR:
+An automatic metric for MT evaluation with improved
+204
+SordoniA, Galley M, Auli M, Brockett C, Ji Y, Mitchell M, Nie JY, Gao J, Dolan B. A neural network
+approach to context-sensitive generation of conversational responses. NAACL
+trained on 127M Twitter context-message-response triples
+Summary
+ Commercial	Systems:
+ Goal-oriented:	ontology	+	hand-written	rules	for	slot	fillers
+ Non-goal-oriented:	
+ Simple	rule-based	 systems
+ IR-based:	 mine	datasets	 of	conversations.
+ What’s	the	future
+ More	use	of	data
+ Neural	net	models
+ IR-based	 models	
+ Problems:
+ Acquiring	that	data
+ Integrating	goal-based	and	chatbot-based	 systems
