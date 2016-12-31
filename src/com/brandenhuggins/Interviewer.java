@@ -131,7 +131,7 @@ public class Interviewer {
 
 			while (line != null)
 			{
-				if (line.contains("http") && !line.contains("google"))
+				if (line.contains("http") && !line.contains("google") && !line.contains(".gov"))
 				{
 					String link = line.substring(line.indexOf(':') + 2, line.length());
 					link_list.add(link);
@@ -305,7 +305,7 @@ public class Interviewer {
 		ArrayList<String> question_model = new ArrayList<String>();
 		BufferedReader br = null;
 		try {
-			br = new BufferedReader(new InputStreamReader(new FileInputStream(question_file), "UTF-16"));
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(question_file), "UTF-8"));
 			String line = br.readLine();
 
 			while (line != null)
@@ -352,7 +352,7 @@ public class Interviewer {
 			};
 			// Take a sample of 10% of the links.
 			Random generator = new Random();
-			int i = generator.nextInt(10) + 1;
+			int i = generator.nextInt(125) + 1;
 			if (i == 5)
 			{
 				tasks.add(callable);
@@ -375,6 +375,7 @@ public class Interviewer {
 		text = text.replaceAll("\\+", "");
 		text = text.replaceAll("$", "");
 		text = text.replaceAll("[\\r\\n ]+", " ");
+		text = text.trim().replaceAll(" +",  " ");
 		return text;
 	}
 
@@ -382,17 +383,29 @@ public class Interviewer {
 		String generated_question = null;
 
 		boolean isQuestion = false;
+		int count = 100;
 		while (!isQuestion)
 		{
 			String new_sentence = ri.generateSentence();
 			if (RiTa.isW_Question(new_sentence))
 			{
 				generated_question = convertToProperQuestion(new_sentence);
+				count--;
 			}
-			if (generated_question != null && !generated_question.isEmpty() && !model_questions.contains(generated_question))
+			// Check if the question meets criteria.
+			if (generated_question != null && !generated_question.isEmpty())
+			{
+				boolean already_created = model_questions.contains(generated_question);
+				if (!already_created)
+				{
+					isQuestion = true;
+				}
+			}
+			// Only create one hundred questions before quitting.
+			if (count == 0)
 			{
 				isQuestion = true;
-			}	
+			}
 		}
 		return generated_question;
 	}
@@ -415,7 +428,7 @@ public class Interviewer {
 	public void punishQuestionModel() {
 		// Update weights
 		double previous_value = question_weights.get(n_grams);
-		question_weights.put(n_grams, previous_value - 1.0);
+		question_weights.put(n_grams, previous_value - n_grams);
 		exportWeights(question_weights, question_weight_file);
 	}
 }
