@@ -17,7 +17,7 @@
 		<javac srcdir="${src}" destdir="${build}" classpathref="classpath" includeantruntime="false">
 			<classpath>
 				<pathelement path="lib/rita.jar"/>
-				<pathelement path="lib/simplenlg.jar"/>
+				<pathelement path="lib/jsoup-1.9.2.jar"/>
 			</classpath>
 		</javac>
 	</target>
@@ -27,7 +27,7 @@
 			<fileset dir="${build}/com/brandenhuggins"/>
 			<zipgroupfileset includes="*.jar"  dir="${lib.dir}"/>
 			<manifest>
-				<attribute name="Main-Class" value="com.brandenhuggins.Interviewer"/>
+				<attribute name="Main-Class" value="com.brandenhuggins.InterviewCreator"/>
 				<attribute name="Class-Path" value="classpath"/>
 			</manifest>
 		</jar>
