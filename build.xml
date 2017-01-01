@@ -18,6 +18,8 @@
 			<classpath>
 				<pathelement path="lib/rita.jar"/>
 				<pathelement path="lib/jsoup-1.9.2.jar"/>
+				<pathelement path="lib/jgoodies-forms-1.8.0-sources.jar"/>
+				<pathelement path="lib/jgoodies-forms-1.8.0.jar"/>
 			</classpath>
 		</javac>
 	</target>

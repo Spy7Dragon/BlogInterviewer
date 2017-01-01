@@ -29,55 +29,29 @@ import org.jsoup.nodes.Document;
 
 public class Interviewer {
 
+	// Lists
 	private static HashMap<Integer, Double> question_weights;
 	private static HashMap<Integer, Double> title_weights;
+	private List<String> model_questions = new ArrayList<String>();
+	private static String[] tags = {"AI", "ML", "artificial intelligence", "machine learning", "autonomous", "programming", 
+			"software", "software development", "robots", "robotics", "automate", "intelligent", "navigation", "decision making"};
+	private ArrayList<String> rejected_questions = new ArrayList<String>();
+	private static String[] question_starts = {"What", "When", "Where", "Why", "Who", "How"};
+	// Strings		
 	private static String question_file = "data/QuestionModel.txt";
 	private static String data_file = "data/History.txt";
 	private static String question_weight_file = "data/question_weights.data";
 	private static String title_weight_file = "data/title_weights.data";
 	private static String n_grams_file = "data/n_grams.data";
-	private List<String> model_questions = new ArrayList<String>();
+	// Numbers
 	private static int n_grams;
 	private static int max_n_grams = 20;
+	// Objects
+	private RiMarkov interview_markov;
 
 	public Interviewer()
 	{
 
-	}
-
-	private void printQuestions(ArrayList<String> generated_sentences) {
-		for (String sentence : generated_sentences)
-		{
-			System.out.println(sentence);
-		}
-	}
-
-	private ArrayList<String> generateQuestions(RiMarkov ri) {
-		ArrayList<String> generated_sentences = new ArrayList<String>();
-
-		int threads = Runtime.getRuntime().availableProcessors();
-		ExecutorService service = Executors.newFixedThreadPool(threads);
-		ArrayList<Callable> tasks = new ArrayList<Callable>();
-
-		for (int i = 0; i < 10; i++)
-		{
-			Callable<Void> callable = new Callable<Void>()
-			{
-				@Override
-				public Void call() throws Exception {
-					generated_sentences.add(generateQuestion(ri));
-					return null;
-				}
-			};
-			tasks.add(callable);
-		}
-		try {
-			service.invokeAll((Collection<? extends Callable<Void>>) tasks);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		service.shutdown();
-		return generated_sentences;
 	}
 
 	private static String prepareData() {
@@ -101,7 +75,10 @@ public class Interviewer {
 						if (doc.body().text() != null)
 						{
 							text = doc.body().text();
-							full_data.append(text);
+							if (stringContainsItemFromList(text, tags))
+							{
+								full_data.append(text);
+							}
 						}
 					} catch (IOException e) {
 						// Too many websites to post every error.
@@ -118,8 +95,9 @@ public class Interviewer {
 		}
 		service.shutdown();
 
-		full_data.append(prepareFile(question_file));		
-		return full_data.toString();
+		full_data.append(prepareFile(question_file));	
+		String formatted_data = prepareText(full_data.toString());
+		return formatted_data;
 	}
 
 	private static HashSet<String> getURLs(String filename){
@@ -131,7 +109,7 @@ public class Interviewer {
 
 			while (line != null)
 			{
-				if (line.contains("http") && !line.contains("google") && !line.contains(".gov"))
+				if (line.contains("http") && !line.contains(".gov"))
 				{
 					String link = line.substring(line.indexOf(':') + 2, line.length());
 					link_list.add(link);
@@ -156,13 +134,31 @@ public class Interviewer {
 
 	private static String convertToProperQuestion(String new_sentence) {
 		String return_string = null;
+		// Replace double quotations.
+		new_sentence = new_sentence.replace("\"",  "");		
+		// Create proper beginning.
+		char[] character_check = new_sentence.toCharArray();
+		if (!Character.isUpperCase(character_check[0]))
+		{
+			character_check[0] = Character.toUpperCase(character_check[0]);
+			new_sentence = String.copyValueOf(character_check);
+		}
+		// Create proper ending.
 		if (new_sentence.endsWith("."))
 		{
 			return_string = new_sentence.substring(0, new_sentence.length() - 1) + "?";
 		}
+		else if (new_sentence.endsWith(" ?"))
+		{
+			return_string = new_sentence.substring(0, new_sentence.length() - 2) + "?";
+		}
 		else if (new_sentence.endsWith("?"))
 		{
 			return_string = new_sentence;
+		}
+		else
+		{
+			return_string = new_sentence + "?";
 		}
 		return return_string;
 	}
@@ -187,7 +183,7 @@ public class Interviewer {
 		{
 			key = 2;
 		}
-		
+
 		// Look for highest weight with a preference for lower keys.
 		for (int i = 2; i <= max_n_grams; i++)
 		{
@@ -342,7 +338,10 @@ public class Interviewer {
 						if (doc.body().text() != null)
 						{
 							text = doc.body().text();
-							full_data.append(text);
+							if (stringContainsItemFromList(text, tags))
+							{
+								full_data.append(text);
+							}
 						}
 					} catch (IOException e) {
 						// Too many websites to post every error.
@@ -370,7 +369,20 @@ public class Interviewer {
 		return formatted_data;
 	}
 
-	private String prepareText(String text) {
+	protected static boolean stringContainsItemFromList(String text, String[] tags) {
+		boolean truth = false;
+		for (String item : tags)
+		{
+			if (text.contains(item))
+			{
+				truth = true;
+				break;
+			}
+		}
+		return truth;
+	}
+
+	private static String prepareText(String text) {
 		text = text.replaceAll("[[(]){}<>]", "");
 		text = text.replaceAll("\\+", "");
 		text = text.replaceAll("$", "");
@@ -381,16 +393,30 @@ public class Interviewer {
 
 	private String generateQuestion(RiMarkov ri) {
 		String generated_question = null;
-
+		
 		boolean isQuestion = false;
-		int count = 100;
 		while (!isQuestion)
 		{
-			String new_sentence = ri.generateSentence();
-			if (RiTa.isW_Question(new_sentence))
+			// String new_sentence = ri.generateSentence();
+			StringBuffer new_build = new StringBuffer();
+			String[] squish = ri.generateUntil("?", 7, 35);
+			for (int i = 0; i < squish.length; i++)
 			{
-				generated_question = convertToProperQuestion(new_sentence);
-				count--;
+				new_build.append(squish[i]);
+				if (i < squish.length - 1)
+				{
+					new_build.append(" ");
+				}				
+			}
+			String new_sentence = new_build.toString();
+			if (isWH_Question(new_sentence))
+			{
+				String new_question = convertToProperQuestion(new_sentence);
+				// Check if the question has already been rejected.
+				if (!rejected_questions.contains(new_question))
+				{
+					generated_question = new_question;
+				}
 			}
 			// Check if the question meets criteria.
 			if (generated_question != null && !generated_question.isEmpty())
@@ -401,14 +427,20 @@ public class Interviewer {
 					isQuestion = true;
 				}
 			}
-			// Only create one hundred questions before quitting.
-			if (count == 0)
-			{
-				isQuestion = true;
-			}
 		}
 		return generated_question;
 	}
+	
+	public static boolean isWH_Question(String sentence) {
+	    for (int i = 0; i < question_starts.length; i++)
+	    {
+	    	if ((sentence.trim().toUpperCase()).startsWith(question_starts[i].toUpperCase()))
+	    	{
+	    		return true;
+	    	}
+	    }
+	    return false;
+	  }
 
 	public void rewardQuestionModel(String good_question) {
 		// Update weights
@@ -425,10 +457,58 @@ public class Interviewer {
 		}		
 	}
 
-	public void punishQuestionModel() {
+	public void punishQuestionModel(String bad_question) {
 		// Update weights
 		double previous_value = question_weights.get(n_grams);
 		question_weights.put(n_grams, previous_value - n_grams);
 		exportWeights(question_weights, question_weight_file);
+		// Put question on rejection list.
+		rejected_questions.add(bad_question);
+	}
+
+	public void startInterview() {
+		importWeights();
+		getN();
+		getModelQuestions();
+		interview_markov = new RiMarkov(n_grams, true, false);
+		String data = prepareData();
+		interview_markov.loadText(data);
+	}
+
+	public void rewardQuestionModel(String good_question, int length) {
+		// Update weights
+		double previous_value = question_weights.get(n_grams);
+		question_weights.put(n_grams, previous_value + length);
+		exportWeights(question_weights, question_weight_file);
+		// Add question to model.
+		try {
+			PrintWriter output = new PrintWriter(new BufferedWriter(new FileWriter(question_file, true)));
+			output.println(good_question);
+			output.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
+
+	public String getInterviewQuestion() {
+		String generated_question = generateQuestion(interview_markov);
+		return generated_question;
+	}
+
+	public void createTitle(BlogPost current_blog) {
+		importWeights();
+		getN();
+		RiMarkov ri = new RiMarkov(n_grams, true, false);
+		// Add posts to the data used for creating the title.
+		StringBuilder post_builder = new StringBuilder();
+		for (Post post : current_blog.getPosts())
+		{
+			post_builder.append(post.getQuestion() + " ");
+			post_builder.append(post.getResponse() + " ");
+		}
+		String data = post_builder.toString();
+		ri.loadText(data);
+		String title = ri.generateSentence();
+		current_blog.setTitle(title);
 	}
 }
