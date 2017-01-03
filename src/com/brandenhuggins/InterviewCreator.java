@@ -74,26 +74,33 @@ public class InterviewCreator {
 		btnInterview = new JButton("Interview");
 		btnInterview.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				interview_mode = true;
-				btnNo.setEnabled(true);
-				btnRespond.setEnabled(true);
+				// Disable interface.
 				btnInterview.setEnabled(false);
 				btnTrain.setEnabled(false);
-				computer.startInterview();
+				// Initialize variables.
+				interview_mode = true;
 				interview_count = 5;
 				current_blog = new BlogPost();
+				// Perform actions.
+				computer.startInterview();
 				updateInterview();
+				// Update interface;
+				btnNo.setEnabled(true);
+				btnRespond.setEnabled(true);
 			}
 		});
 		
 		btnTrain = new JButton("Train");
 		btnTrain.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				btnYes.setEnabled(true);
-				btnNo.setEnabled(true);
+				// Disable interface.
 				btnInterview.setEnabled(false);
 				btnTrain.setEnabled(false);
+				// Perform actions.
 				lblQuestion.setText(computer.getTrainingQuestion());
+				// Update interface.
+				btnYes.setEnabled(true);
+				btnNo.setEnabled(true);
 			}
 		});
 		
@@ -118,18 +125,24 @@ public class InterviewCreator {
 		btnYes = new JButton("Yes");
 		btnYes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// Disable interface.
 				btnYes.setEnabled(false);
 				btnNo.setEnabled(false);
+				// Perform Actions.
 				computer.rewardQuestionModel(lblQuestion.getText());
+				// Update interface.
 				btnTrain.setEnabled(true);
+				btnInterview.setEnabled(true);
 			}
 		});
 		
 		btnCreatePost = new JButton("Create Post");
 		btnCreatePost.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				current_blog.postToBlog();
+				// Disable interface.
 				btnCreatePost.setEnabled(false);
+				// Perform actions.
+				current_blog.postToBlog();
 			}
 		});
 		btnCreatePost.setEnabled(false);
@@ -175,26 +188,32 @@ public class InterviewCreator {
 		btnRespond = new JButton("Respond");
 		btnRespond.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// Initialize variables.
 				Post new_post = new Post(lblQuestion.getText(), txtResponse.getText());
-				txtResponse.setText("");
+				//Perform actions.
 				current_blog.addPost(new_post);
 				computer.rewardQuestionModel(lblQuestion.getText(), txtResponse.getText().length());
 				interview_count--;
 				updateInterview();
+				// Update interface.
+				txtResponse.setText("");
 			}
 		});
 		
 		btnNo = new JButton("No");
 		btnNo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// Perform actions.
 				if (interview_mode)
 				{
 					updateInterview();
 				}
 				else
 				{
+					// Disable interface.
 					btnYes.setEnabled(false);
 					btnNo.setEnabled(false);
+					// Update interface.
 					btnTrain.setEnabled(true);
 					btnInterview.setEnabled(true);
 				}
@@ -216,19 +235,25 @@ public class InterviewCreator {
 	
 	protected void updateInterview()
 	{
+		// Perform actions.
 		if (interview_count > 0)
 		{
 			lblQuestion.setText(computer.getInterviewQuestion());
 		}
 		else
 		{
+			// Disable interface.
 			btnRespond.setEnabled(false);
 			btnNo.setEnabled(false);
+			// Initialize variables.
+			interview_mode = false;
+			// Perform actions.
+			computer.createTitle(current_blog);
+			// Update interface.
 			btnTrain.setEnabled(true);
 			btnInterview.setEnabled(true);
-			computer.createTitle(current_blog);
 			btnCreatePost.setEnabled(true);
-			interview_mode = false;
+			
 		}
 	}
 }
